@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- 보안 정책(CSP): 허용한 주소 외의 스크립트·리소스는 차단합니다. file: 은 PC에서 파일을 직접 열어 테스트할 때를 위한 것이며, 배포 시에는 지워도 됩니다. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' file: 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' file: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' file: data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>MOVIE FRAME MAKER</title>
+<meta name="description" content="이미지에 영화 레터박스, 자막, 필름 효과를 입히는 브라우저 기반 영화 프레임 제작 도구">
+<meta property="og:title" content="MOVIE FRAME MAKER">
+<meta property="og:description" content="이미지에 영화 레터박스, 자막, 필름 효과를 입히는 브라우저 기반 영화 프레임 제작 도구">
+<meta property="og:url" content="https://ohdaeun1016.github.io/MovieFrame-maker/">
+<meta name="theme-color" content="#141518">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23141518'/%3E%3Crect x='5' y='10' width='22' height='12' fill='%23e3b45b'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&family=Noto+Serif+KR:wght@400;700&family=Inter:ital,wght@0,400;0,700;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+JP:wght@400;700&family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+<script src="./config.js" defer></script>
+<script src="./app.js" defer></script>
+</head>
+<body>
+<header><h1>MOVIE FRAME MAKER</h1><button class="btn sm" id="reset">초기화</button></header>
+<div class="app">
+ <div class="sticky">
+  <div class="stage" id="stage">
+   <div class="drop" id="drop">이미지를 끌어다 놓거나 눌러서 선택해 주세요. (여러 장 가능)<br><small>Ctrl+V 붙여넣기도 가능합니다. 이미지는 서버로 전송되지 않고 브라우저 안에서만 처리됩니다.</small></div>
+   <canvas id="cv"></canvas>
+  </div>
+  <div class="strip" id="strip" hidden></div>
+  <div class="warn" id="warn"></div>
+ </div>
+
+ <div class="panel">
+  <div class="tabs" id="tabs">
+   <button class="on" data-t="p0">INFO</button><button data-t="p1">이미지</button><button data-t="p2">효과</button><button data-t="p3">자막</button><button data-t="p4">저장</button>
+  </div>
+
+  <!-- 프리셋 -->
+  <div class="pane on" id="p0">
+   <h3>감튀 커미션 전용 프리셋</h3>
+   <div class="seg" id="myPresets"></div>
+   <p class="hint">감튀의 커미션 분위기에 맞춰 구성된 프리셋입니다. 선택한 프리셋의 설정이 한 번에 적용됩니다.</p>
+   <div class="promo" id="promo"></div>
+   <details class="fold">
+    <summary>크레딧 · 유의사항</summary>
+    <div class="credit">
+     <b>사이트 제작자</b>감튀
+     <b>제작 방식</b>본 사이트는 Claude(Anthropic)를 활용한 바이브 코딩 방식으로 제작되었습니다.
+     <b>사용한 글꼴</b>
+     <ul>
+      <li>한국어: 나눔고딕, Noto Serif KR, 조선굴림체</li>
+      <li>영어: Inter, Libre Baskerville, Roboto Mono</li>
+      <li>일본어: Noto Sans JP, Noto Serif JP</li>
+      <li>중국어: Noto Sans SC, Noto Serif SC</li>
+     </ul>
+     조선굴림체를 제외한 글꼴은 Google Fonts에서 제공되며, 각 글꼴의 라이선스는 Google Fonts의 안내를 따릅니다.
+     <b>사용한 오픈소스</b>
+     <ul>
+      <li>JSZip (MIT 또는 GPLv3) — ZIP 저장 · <a href="https://stuk.github.io/jszip/" data-ext>stuk.github.io/jszip</a></li>
+      <li>gifenc (MIT) — GIF 저장 · <a href="https://github.com/mattdesl/gifenc" data-ext>github.com/mattdesl/gifenc</a></li>
+      <li>Lucide (ISC) — 서식·정렬·공유 아이콘 · <a href="https://lucide.dev" data-ext>lucide.dev</a></li>
+      <li>mulberry32 난수 생성 코드 (퍼블릭 도메인) — 그레인·눈·비 효과</li>
+     </ul>
+
+     <b>유의사항</b>
+     <ul>
+      <li>불러온 이미지는 외부 서버로 전송되지 않으며, 현재 브라우저 내에서 처리됩니다.</li>
+      <li>타인의 저작물을 사용할 경우 해당 저작물의 이용 조건을 확인해 주세요.</li>
+      <li>글꼴 및 기타 리소스의 이용에는 각 제공처의 라이선스가 적용됩니다. 결과물을 배포하거나 상업적으로 이용할 경우 해당 라이선스를 확인해 주세요.</li>
+      <li>브라우저 및 기기 환경에 따라 화면 표시나 이미지 저장 결과가 다소 달라질 수 있습니다.</li>
+     </ul>
+    </div>
+   </details>
+  </div>
+
+  <!-- 이미지 -->
+  <div class="pane" id="p1">
+   <button class="btn full" id="pick" style="margin-top:0">이미지 선택</button><input type="file" id="file" accept="image/*" multiple hidden>
+   <p class="hint">이미지 비율·레터박스·효과·자막 스타일은 전체 이미지에 공통 적용되며, 위치·확대·회전·자막 문구는 이미지별로 설정됩니다.</p>
+   <h3>이미지 비율</h3>
+   <div class="row"><div class="seg">
+     <button class="o" data-set="ratio=1.7778">16:9</button><button class="o" data-set="ratio=2.39">2.39:1</button><button class="o" data-set="ratio=1.85">1.85:1</button><button class="o" data-set="ratio=1.3333">4:3</button><button class="o" data-set="ratio=1">1:1</button><button class="o" data-set="ratio=orig">원본</button><button class="o" data-set="ratio=custom">직접</button></div>
+     <p class="hint">2.39:1 시네마스코프 · 1.85:1 극장 표준 · 4:3 고전/애니</p></div>
+   <div class="row" data-if="ratio=custom"><label><span>가로 : 세로 <span class="v"></span></span></label><input type="range" data-k="frameCustom" min="0.5" max="3" step="0.01"></div>
+   <h3>이미지 위치 · 크기</h3>
+   <p class="hint" style="margin:0 0 10px">미리보기를 드래그하여 이동하고, 마우스 휠로 확대·축소할 수 있습니다.</p>
+   <div class="row"><label><span>확대 <span class="v"></span></span></label><input type="range" data-k="zoom" min="1" max="4" step="0.01"></div>
+   <div class="row"><label><span>가로 위치 <span class="v"></span></span><button class="mini" data-act="resetX">가운데로</button></label><input type="range" data-pan="x" min="-100" max="100" step="1"></div>
+   <div class="row"><label><span>세로 위치 <span class="v"></span></span><button class="mini" data-act="resetY">가운데로</button></label><input type="range" data-pan="y" min="-100" max="100" step="1"></div>
+   <p class="hint" id="panHint" hidden style="margin:-6px 0 12px">이미지를 이동할 여유가 없습니다. 확대하면 이동할 수 있습니다.</p>
+   <div class="row"><label><span>미세 회전 <span class="v"></span>°</span><button class="mini" data-def="rot,angle">회전 초기화</button></label><input type="range" data-k="angle" min="-45" max="45" step="0.5"></div>
+   <div class="seg">
+     <button class="o" data-act="rotL">⟲ 90°</button><button class="o" data-act="rotR">⟳ 90°</button><button class="o" data-act="flip">좌우반전</button><button class="o" data-act="center">가운데로</button></div>
+   <h3>레터박스(검정 띠)</h3>
+   <div class="row"><div class="lab">최종 비율</div><div class="seg">
+     <button class="o" data-set="lbPreset=0">없음</button><button class="o" data-set="lbPreset=1.7778">16:9</button><button class="o" data-set="lbPreset=1.3333">4:3</button><button class="o" data-set="lbPreset=1">1:1</button><button class="o" data-set="lbPreset=0.8">4:5</button><button class="o" data-set="lbPreset=custom">직접</button></div>
+     <p class="hint">이미지는 자르지 않고, 선택한 비율이 될 때까지 검정 여백만 추가합니다.</p></div>
+   <div data-if="lbPreset=custom">
+    <div class="row"><label><span>위 여백 (이미지 높이 대비) <span class="v"></span>%</span></label><input type="range" data-k="lbTop" min="0" max="100" step="0.5"></div>
+    <div class="row"><label><span>아래 여백 (이미지 높이 대비) <span class="v"></span>%</span></label><input type="range" data-k="lbBot" min="0" max="100" step="0.5"></div>
+    <label class="tg"><span>위·아래 같이 조절</span><input type="checkbox" data-k="lbLink"><span class="pill"></span></label>
+   </div>
+  </div>
+
+  <!-- 효과 -->
+  <div class="pane" id="p2">
+   <h3>필터</h3>
+   <label class="tg"><span>흑백</span><input type="checkbox" data-k="gray"><span class="pill"></span></label>
+   <label class="tg"><span>그레인 (필름 입자)</span><input type="checkbox" data-k="grain"><span class="pill"></span></label>
+   <div class="row" data-if="grain" style="margin-top:8px"><label><span>그레인 강도 <span class="v"></span></span></label><input type="range" data-k="grainAmt" min="0" max="100"></div>
+   <h3>위쪽 그라데이션</h3>
+   <div class="row"><div class="seg"><button class="o" data-set="gTop=none">없음</button><button class="o" data-set="gTop=dark">어둡게</button><button class="o" data-set="gTop=light">밝게</button></div>
+     <p class="hint">어둡게는 곱하기, 밝게는 스크린 방식으로 합성됩니다.</p></div>
+   <div data-if="gTop!=none">
+     <div class="row"><div class="lab">색상</div><div class="seg" data-pal="gTopColor"></div></div>
+     <div class="row"><label><span>강도 <span class="v"></span></span></label><input type="range" data-k="gTopAmt" min="0" max="100"></div>
+     <div class="row"><label><span>범위 <span class="v"></span>%</span></label><input type="range" data-k="gTopRange" min="10" max="100"></div></div>
+   <h3>아래쪽 그라데이션</h3>
+   <div class="row"><div class="seg"><button class="o" data-set="gBot=none">없음</button><button class="o" data-set="gBot=dark">어둡게</button><button class="o" data-set="gBot=light">밝게</button></div></div>
+   <div data-if="gBot!=none">
+     <div class="row"><div class="lab">색상</div><div class="seg" data-pal="gBotColor"></div></div>
+     <div class="row"><label><span>강도 <span class="v"></span></span></label><input type="range" data-k="gBotAmt" min="0" max="100"></div>
+     <div class="row"><label><span>범위 <span class="v"></span>%</span></label><input type="range" data-k="gBotRange" min="10" max="100"></div></div>
+   <h3>날씨 효과</h3>
+   <div class="row"><div class="seg"><button class="o" data-set="weather=none">없음</button><button class="o" data-set="weather=snow">눈</button><button class="o" data-set="weather=rain">비</button></div></div>
+   <div class="row" data-if="weather!=none"><label><span>양 <span class="v"></span></span><button class="mini" data-def="wInt">초기화</button></label><input type="range" data-k="wInt" min="5" max="100"></div>
+   <div class="row" data-if="weather!=none"><label><span>속도 <span class="v"></span></span><button class="mini" data-def="wSpeed">초기화</button></label><input type="range" data-k="wSpeed" min="0.5" max="3" step="0.1"></div>
+   <div class="row" data-if="weather=rain"><label><span>방향 <span class="v"></span>°</span><button class="mini" data-def="wDir">초기화</button></label><input type="range" data-k="wDir" min="-45" max="45" step="1"></div>
+   <p class="hint" data-if="weather!=none">미리보기에서 움직이는 모습을 확인할 수 있고, 저장 탭에서 GIF로 저장할 수 있습니다. PNG·JPG로 저장하면 한 장면이 고정된 상태로 저장됩니다.</p>
+  </div>
+
+  <!-- 자막 -->
+  <div class="pane" id="p3">
+   <div class="row"><label><span>자막 문구 (줄바꿈 가능 · 이미지마다 따로 저장)</span></label><textarea data-k="text"></textarea></div>
+
+   <details class="sec" open><summary><span>스타일 프리셋</span></summary><div class="body"><div class="seg" id="stylePresets"></div></div></details>
+
+   <details class="sec"><summary><span>글꼴</span><button class="btn sm rs" data-reset="font">초기화</button></summary><div class="body">
+     <div class="row"><div class="lab">한국어</div><div class="seg" id="f_ko"></div></div>
+     <div class="row"><div class="lab">영어</div><div class="seg" id="f_en"></div></div>
+     <div class="row"><div class="lab">일본어</div><div class="seg" id="f_ja"></div></div>
+     <div class="row"><div class="lab">중국어</div><div class="seg" id="f_zh"></div></div>
+     <div class="tools">
+       <div><div class="lab">서식</div><div class="ig"><button class="ib" data-tog="bold" data-ic="bold" title="굵게"></button><button class="ib" data-tog="italic" data-ic="italic" title="기울임"></button></div></div>
+       <div><div class="lab">정렬</div><div class="ig"><button class="ib" data-set="align=left" data-ic="left" title="왼쪽 맞춤"></button><button class="ib" data-set="align=center" data-ic="center" title="가운데 정렬"></button><button class="ib" data-set="align=right" data-ic="right" title="오른쪽 맞춤"></button></div></div>
+     </div>
+   </div></details>
+
+   <details class="sec"><summary><span>크기</span><button class="btn sm rs" data-reset="size">초기화</button></summary><div class="body">
+     <div class="row"><div class="seg"><button class="o" data-set="size=72">대</button><button class="o" data-set="size=48">중</button><button class="o" data-set="size=32">소</button></div></div>
+     <div class="row"><label><span>세부 크기 (1080p 기준) <span class="v"></span></span></label><input type="range" data-k="size" min="12" max="140"></div>
+   </div></details>
+
+   <details class="sec"><summary><span>색상</span></summary><div class="body">
+     <div class="seg">
+       <button class="o sw" data-set="color=#ffffff" style="background:#fff" title="흰색"></button><button class="o sw" data-set="color=#000000" style="background:#000" title="검정"></button><button class="o sw" data-set="color=#ffe14d" style="background:#ffe14d" title="노랑"></button>
+       <input type="text" data-k="color" style="width:110px" maxlength="7" placeholder="#ffffff"></div>
+   </div></details>
+
+   <details class="sec"><summary><span>위치</span><button class="btn sm rs" data-reset="pos">초기화</button></summary><div class="body">
+     <div class="row"><div class="seg"><button class="o" data-set="pos=top">상단</button><button class="o" data-set="pos=bottom">하단</button></div></div>
+     <div class="row"><div class="seg"><button class="o" data-set="place=bar">레터박스 위</button><button class="o" data-set="place=image">그림 위</button></div><p class="hint">레터박스가 없는 경우 그림 위로 표시됩니다.</p></div>
+     <div class="row"><label><span>가로(X) <span class="v"></span></span><button class="mini" data-def="x">초기화</button></label><input type="range" data-k="x" min="-50" max="50" step="0.5"></div>
+     <div class="row"><label><span>세로(Y) <span class="v"></span></span><button class="mini" data-def="y">초기화</button></label><input type="range" data-k="y" min="-30" max="30" step="0.5"></div>
+   </div></details>
+
+   <details class="sec"><summary><span>테두리</span></summary><div class="body">
+     <label class="tg"><span>테두리 사용</span><input type="checkbox" data-k="stroke"><span class="pill"></span></label>
+     <div data-if="stroke" style="margin-top:8px">
+       <div class="row"><div class="seg"><button class="o" data-set="strokeColor=#000000">검정</button><button class="o" data-set="strokeColor=#ffffff">흰색</button></div></div>
+       <div class="row"><label><span>두께 <span class="v"></span></span></label><input type="range" data-k="strokeW" min="1" max="30"></div></div>
+   </div></details>
+
+   <details class="sec"><summary><span>텍스트 박스</span></summary><div class="body">
+     <label class="tg"><span>박스 사용</span><input type="checkbox" data-k="box"><span class="pill"></span></label>
+     <div data-if="box" style="margin-top:8px">
+       <div class="row"><div class="seg"><button class="o" data-set="boxColor=#000000">검정</button><button class="o" data-set="boxColor=#ffffff">흰색</button></div></div>
+       <div class="row"><div class="lab">투명도</div><div class="seg"><button class="o" data-set="boxAlpha=30">30%</button><button class="o" data-set="boxAlpha=50">50%</button><button class="o" data-set="boxAlpha=70">70%</button><button class="o" data-set="boxAlpha=100">100%</button></div></div></div>
+   </div></details>
+
+   <details class="sec"><summary><span>글자 · 줄 간격</span><button class="btn sm rs" data-reset="gap">초기화</button></summary><div class="body">
+     <div class="row"><label><span>글자 간격 <span class="v"></span></span></label><input type="range" data-k="lsp" min="-5" max="30"></div>
+     <div class="row"><label><span>줄 간격 <span class="v"></span></span></label><input type="range" data-k="lh" min="1" max="2.2" step="0.05"></div>
+   </div></details>
+  </div>
+
+  <!-- 저장 -->
+  <div class="pane" id="p4">
+   <div class="row"><div class="lab">형식</div><div class="seg"><button class="o" data-set="fmt=png">PNG</button><button class="o" data-set="fmt=jpg">JPG</button><button class="o" data-if="weather!=none" data-set="fmt=gif">GIF</button></div></div>
+   <div class="row" data-if="fmt=jpg"><label><span>JPG 화질 <span class="v"></span></span></label><input type="range" data-k="q" min="50" max="100"></div>
+   <div class="row" data-if="fmt!=gif"><div class="lab">사이즈</div><div class="seg"><button class="o" data-set="res=orig">원본</button><button class="o" data-set="res=1080">1080</button></div></div>
+   <div class="row" data-if="fmt=gif"><div class="lab">길이 (반복 재생)</div><div class="seg"><button class="o" data-set="wSec=2">2초</button><button class="o" data-set="wSec=3">3초</button><button class="o" data-set="wSec=5">5초</button></div>
+     <p class="hint">GIF는 현재 선택한 이미지 한 장만 저장되며, 세로 720px로 고정됩니다. 그레인이 켜져 있으면 용량이 크게 늘어날 수 있습니다.</p></div>
+   <p class="hint" id="sizeInfo" style="margin:0 0 12px"></p>
+   <button class="btn main" id="save">저장하기</button>
+   <button class="btn full" id="saveAll" hidden>전체 저장 (ZIP)</button>
+   <button class="btn full" id="share" hidden>전체 공유 · 사진 앱에 저장</button>
+   <p class="hint" id="prog"></p>
+   <p class="hint">한 변이 4,000px을 초과하는 이미지는 자동으로 축소됩니다.<br>여러 장 저장 시 순차적으로 처리되며, 원본 해상도에 따라 저장 시간이 달라질 수 있습니다.<br>아이폰에서는 저장한 파일이 '파일' 앱에 들어갈 수 있습니다. 사진 앱에 넣으려면 파일을 열어 '이미지 저장'을 눌러 주세요.</p>
+  </div>
+ </div>
+</div>
+
+<!-- 외부 사이트 이동 확인 -->
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="mdTitle">
+ <div class="md-box">
+  <h4 id="mdTitle">외부 사이트로 이동할까요?</h4>
+  <p id="mdBody"></p>
+  <div class="md-btns"><button class="btn" id="mdCancel">취소</button><button class="btn main" id="mdOk" style="width:auto;padding:6px 18px">이동</button></div>
+ </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+</body>
+</html>
