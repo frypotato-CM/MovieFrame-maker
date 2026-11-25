@@ -540,7 +540,7 @@ let pendingUrl = '';
 function askGo(name, url){
   if(!/^https:\/\//.test(url)) return;
   pendingUrl = url;
-  $('#mdBody').textContent = `${name} (${new URL(url).hostname}) 페이지가 새 탭에서 열립니다.`;
+  $('#mdBody').textContent = `감튀의 ${name} 프로필 페이지로 이동합니다.`;
   $('#modal').hidden = false; $('#mdOk').focus();
 }
 const closeModal = () => { $('#modal').hidden = true; pendingUrl = ''; };
