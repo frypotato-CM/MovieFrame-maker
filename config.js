@@ -6,7 +6,7 @@ const MAX_PIXELS = 120e6;              // 가로×세로가 이 값을 넘는 �
 
 const PROMO = {
   text: '사이트 제작자: 감튀 @frypotato_CM',
-  shareUrl: 'https://ohdaeun1016.github.io/MovieFrame-maker/',
+  shareUrl: 'https://frypotato-cm.github.io/MovieFrame-maker/',
   links: [
     {label: 'CREPE', name: '크레페', url: 'https://kre.pe/FWPq', icon: './crepe-logo.png'},
     {label: 'X', name: 'X(트위터)', url: 'https://x.com/frypotato_CM', icon: './x-logo.svg'}

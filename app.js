@@ -552,9 +552,31 @@ let toastT = 0;
 function toast(msg){ const el = $('#toast'); el.textContent = msg; el.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2200); }
 async function shareSite(){
   const url = PROMO.shareUrl;
-  if(navigator.share){ try{ await navigator.share({title:'MOVIE FRAME MAKER', url}); }catch(e){} return; }
-  try{ await navigator.clipboard.writeText(url); toast('링크가 복사되었습니다.'); }
-  catch(e){ prompt('아래 링크를 복사해 주세요.', url); }
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(url);
+      toast('링크가 복사되었습니다.');
+      return;
+    }
+  }catch(e){}
+
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    if(ok){
+      toast('링크가 복사되었습니다.');
+      return;
+    }
+  }catch(e){}
+
+  prompt('아래 링크를 복사해 주세요.', url);
 }
 
 /* ---------- 글꼴 버튼 / 아이콘 / 팔레트 / 프리셋 / 홍보 타일 ---------- */
