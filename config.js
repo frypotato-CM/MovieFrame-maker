@@ -60,8 +60,35 @@ const STYLE_PRESETS = [{name:'기본', v:ST.basic},{name:'넷플릭스', v:ST.ne
 // 전용 프리셋 (이미지 비율·레터박스·효과·자막 스타일 전부 덮어씀, 이미지·자막 문구 제외) — 이름/값 자유롭게 수정
 // ratio = 이미지를 자르는 비율, lbPreset = 레터박스로 맞출 최종 비율(0이면 없음)
 const MY_PRESETS = [
-  {name:'크리스마스 타입 (임시)', v:{...ST.emotion, ratio:2.39, lbPreset:1.7778, grain:true, grainAmt:30, gTop:'dark', gTopAmt:30, gTopRange:35, gBot:'dark', gBotAmt:55, gBotRange:40, size:44}},
-  {name:'커미션 프리셋 B (임시)', v:{...ST.retro, ratio:2.39, lbPreset:1.7778, gray:true, grain:true, grainAmt:50, gBot:'dark', gBotAmt:40, gBotRange:30, place:'bar', size:40, box:false}}
+  {
+    name: '크리스마스(이미지)',
+    v: {
+      ...ST.retro,
+      ratio: 'orig',
+      lbPreset: 1.7778,
+      grain: true,
+      grainAmt: 30,
+      gBot: 'dark',
+      gBotColor: '#55423e',
+      gBotAmt: 36,
+      gBotRange: 30
+    }
+  },
+  {
+    name: '크리스마스(GIF)',
+    v: {
+      ...ST.retro,
+      ratio: 'orig',
+      lbPreset: 1.7778,
+      weather: 'snow',
+      wInt: 70,
+      wSpeed: 0.5,
+      gBot: 'dark',
+      gBotColor: '#55423e',
+      gBotAmt: 36,
+      gBotRange: 30
+    }
+  }
 ];
 
 const ICONS = {   // 아이콘: Lucide (ISC License)
