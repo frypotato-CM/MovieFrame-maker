@@ -14,7 +14,6 @@ config.js           ★ 자주 고치는 설정: 폰트 목록, 프리셋, 홍�
 app.js              동작 코드
 crepe-logo.png      CREPE 로고
 x-logo.svg          X 로고
-fonts/ChosunGu.woff (선택) 조선굴림체 파일을 직접 올릴 경우 이 위치에
 
 ```
 
