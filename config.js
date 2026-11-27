@@ -64,13 +64,14 @@ const MY_PRESETS = [
     name: '크리스마스(이미지)',
     v: {
       ...ST.retro,
+      y: 2,
       ratio: 'orig',
       lbPreset: 1.7778,
       grain: true,
-      grainAmt: 30,
+      grainAmt: 15,
       gBot: 'dark',
-      gBotColor: '#55423e',
-      gBotAmt: 36,
+      gBotColor: '#393130',
+      gBotAmt: 30,
       gBotRange: 30
     }
   },
@@ -78,6 +79,7 @@ const MY_PRESETS = [
     name: '크리스마스(GIF)',
     v: {
       ...ST.retro,
+      y: 2,
       ratio: 'orig',
       lbPreset: 1.7778,
       weather: 'snow',
@@ -85,7 +87,7 @@ const MY_PRESETS = [
       wSpeed: 0.5,
       gBot: 'dark',
       gBotColor: '#55423e',
-      gBotAmt: 36,
+      gBotAmt: 30,
       gBotRange: 30
     }
   }
