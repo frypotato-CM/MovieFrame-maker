@@ -228,7 +228,6 @@ function drawWeather(ctx,r,P,phase){
       const x = (((p.x + 0.02*Math.sin(2*Math.PI*(p.m*phase + p.ph)))%1)+1)%1;
       ctx.globalAlpha = 0.4 + 0.6*p.a; ctx.beginPath(); ctx.arc(r.ix + x*r.iw, r.iy + y*r.ih, (1.2+p.r*2.8)*k, 0, 6.2832); ctx.fill();
     }
-  }
   } else {
     ctx.lineCap = 'round'; ctx.strokeStyle = '#dfe8ff';
     for(const p of list){
